@@ -1,10 +1,11 @@
 package br.com.alura;
 
 import br.com.alura.exception.InvalidPostalCodeException;
-import br.com.alura.request.ViaCEPRequest;
+import br.com.alura.resource.ViaCEPRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -17,23 +18,28 @@ public class Main {
       .setPrettyPrinting()
       .create();
     String address, postalCode = "";
-    do {
-      try {
-        System.out.println("Digite o CEP (ou sair para encerrar):");
-        postalCode = scan.next();
-        if (postalCode.equals("sair")) {
-          return;
+    try (FileWriter addressFile = new FileWriter("enderecos.json")) {
+      do {
+        try {
+          System.out.println("Digite o CEP (ou sair para encerrar):");
+          postalCode = scan.next();
+          if (postalCode.equals("sair")) {
+            return;
+          }
+          address = ViaCEPRequest.sendRequestByPostalCode(postalCode);
+          System.out.println(address);
+          addressFile.write(address);
+        } catch (InvalidPostalCodeException e) {
+          System.out.println(STR."Ocorreu um erro no CEP inserido: \{e.getMessage()}");
+        } catch (IOException | InterruptedException e) {
+          System.out.println(STR."Ocorreu um erro na requisição: \{e.getMessage()}");
+        } catch (Exception e) {
+          System.out.println(STR."Ocorreu um erro inesperado: \{e.getMessage()}");
         }
-        address = ViaCEPRequest.sendRequestByPostalCode(postalCode);
-        System.out.println(address);
-      } catch (InvalidPostalCodeException e) {
-        System.out.println(STR."Ocorreu um erro no CEP inserido: \{e.getMessage()}");
-      } catch (IOException | InterruptedException e) {
-        System.out.println(STR."Ocorreu um erro na requisição: \{e.getMessage()}");
-      } catch (Exception e) {
-        System.out.println(STR."Ocorreu um erro inesperado: \{e.getMessage()}");
-      }
-    } while (!postalCode.equalsIgnoreCase("sair"));
+      } while (!postalCode.equalsIgnoreCase("sair"));
+    } catch (IOException e) {
+      System.out.println(STR."Ocorreu um e: \{e.getMessage()}");
+    }
   }
 
 }

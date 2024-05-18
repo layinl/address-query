@@ -1,4 +1,4 @@
-package br.com.alura.request;
+package br.com.alura.resource;
 
 import br.com.alura.exception.InvalidPostalCodeException;
 
