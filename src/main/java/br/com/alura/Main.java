@@ -1,12 +1,15 @@
 package br.com.alura;
 
 import br.com.alura.exception.InvalidPostalCodeException;
+import br.com.alura.model.Address;
 import br.com.alura.resource.ViaCEPRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -17,8 +20,8 @@ public class Main {
     Gson gson = new GsonBuilder()
       .setPrettyPrinting()
       .create();
-    String address, postalCode = "";
-    try (FileWriter addressFile = new FileWriter("enderecos.json")) {
+    String postalCode = "";
+    Address address;
       do {
         try {
           System.out.println("Digite o CEP (ou sair para encerrar):");
@@ -27,8 +30,14 @@ public class Main {
             return;
           }
           address = ViaCEPRequest.sendRequestByPostalCode(postalCode);
-          System.out.println(address);
-          addressFile.write(address);
+
+          System.out.println(gson.toJson(address));
+
+          try (FileWriter addressFile = new FileWriter(STR."./enderecos/\{postalCode}.json")) {
+            addressFile.write(gson.toJson(address));
+          } catch (IOException e) {
+            System.out.println(STR."Ocorreu um erro ao salvar o arquivo: \{e.getMessage()}");
+          }
         } catch (InvalidPostalCodeException e) {
           System.out.println(STR."Ocorreu um erro no CEP inserido: \{e.getMessage()}");
         } catch (IOException | InterruptedException e) {
@@ -37,10 +46,7 @@ public class Main {
           System.out.println(STR."Ocorreu um erro inesperado: \{e.getMessage()}");
         }
       } while (!postalCode.equalsIgnoreCase("sair"));
-    } catch (IOException e) {
-      System.out.println(STR."Ocorreu um e: \{e.getMessage()}");
     }
-  }
 
 }
 

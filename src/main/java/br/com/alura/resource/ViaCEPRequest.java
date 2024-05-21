@@ -1,6 +1,9 @@
 package br.com.alura.resource;
 
 import br.com.alura.exception.InvalidPostalCodeException;
+import br.com.alura.model.Address;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,8 +15,11 @@ import java.util.regex.Pattern;
 
 public class ViaCEPRequest {
 
-  public static String sendRequestByPostalCode (String postalCode) throws IOException, InterruptedException {
+  public static Address sendRequestByPostalCode (String postalCode) throws IOException, InterruptedException {
     checkPostalCode(postalCode);
+    Gson gson = new GsonBuilder()
+      .setPrettyPrinting()
+      .create();
     String address = STR."https://viacep.com.br/ws/\{postalCode}/json/";
     HttpClient client = HttpClient.newHttpClient();
     HttpRequest request = HttpRequest.newBuilder()
@@ -21,10 +27,10 @@ public class ViaCEPRequest {
       .build();
     HttpResponse<String> response = client
       .send(request, HttpResponse.BodyHandlers.ofString());
-    if (response.statusCode() == 400)
+    if (response.statusCode() == 400 || response.body().contains("erro"))
       // redundant, but it's a workaround for now
       throw new InvalidPostalCodeException("HTTP 400 - O CEP informado é inválido");
-    return response.body();
+    return gson.fromJson(response.body(), Address.class);
   }
 
   private static void checkPostalCode(String postalCode) {
