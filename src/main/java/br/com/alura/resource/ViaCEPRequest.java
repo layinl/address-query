@@ -29,7 +29,7 @@ public class ViaCEPRequest {
       .send(request, HttpResponse.BodyHandlers.ofString());
     if (response.statusCode() == 400 || response.body().contains("erro"))
       // redundant, but it's a workaround for now
-      throw new InvalidPostalCodeException("HTTP 400 - O CEP informado é inválido");
+      throw new InvalidPostalCodeException("O CEP é válido, mas não existe");
     return gson.fromJson(response.body(), Address.class);
   }
 
