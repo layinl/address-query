@@ -15,6 +15,15 @@ import java.util.regex.Pattern;
 
 public class ViaCEPRequest {
 
+  /**
+   * Sends a request to ViaCEP to fetch the address by a valid Postal Code
+   * and returns the response as an Address object
+   * @param postalCode the postal code, or CEP, to search
+   * @return the response as an Address object
+   * @throws IOException if there's a problem with I/O while sending or
+   * receiving
+   * @throws InterruptedException if there's interruption
+   */
   public static Address sendRequestByPostalCode (String postalCode) throws IOException, InterruptedException {
     checkPostalCode(postalCode);
     Gson gson = new GsonBuilder()
@@ -28,11 +37,21 @@ public class ViaCEPRequest {
     HttpResponse<String> response = client
       .send(request, HttpResponse.BodyHandlers.ofString());
     if (response.statusCode() == 400 || response.body().contains("erro"))
-      // redundant, but it's a workaround for now
       throw new InvalidPostalCodeException("O CEP é válido, mas não existe");
     return gson.fromJson(response.body(), Address.class);
   }
 
+  /**
+   * Checks if the provided postalCode is valid.
+   * <br/>
+   * A valid postal code might be either of these:
+   * <ul>
+   *   <li>XXXXXXXX</li>
+   *   <li>XXXXX-XXX</li>
+   * </ul>
+   * @param postalCode the postal code to be validated
+   * @throws InvalidPostalCodeException if the postal code is not valid
+   */
   private static void checkPostalCode(String postalCode) {
     final Pattern pattern = Pattern.compile("\\d{8}|\\d{5}-\\d{3}");
     Matcher matcher = pattern.matcher(postalCode);

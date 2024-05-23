@@ -9,6 +9,11 @@ import java.io.IOException;
 
 public class AddressFile {
 
+  /**
+   * Saves the provided Address as JSON to a new or existing file
+   * @param address the address object to be saved
+   * @return address in json format
+   */
   public static String saveJson(Address address) {
     Gson gson = new GsonBuilder()
       .setPrettyPrinting()
