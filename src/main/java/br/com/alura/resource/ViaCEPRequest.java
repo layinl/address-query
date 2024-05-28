@@ -13,6 +13,10 @@ import java.net.http.HttpResponse;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The ViaCEPRequest class organizes the postal code request sending. It
+ * also checks if the postal code is valid.
+ */
 public class ViaCEPRequest {
 
   /**
